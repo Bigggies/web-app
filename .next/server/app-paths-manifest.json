@@ -1,0 +1,11 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/health/route": "app/api/health/route.js",
+  "/api/make-server-36419df2/health/route": "app/api/make-server-36419df2/health/route.js",
+  "/gcb/page": "app/gcb/page.js",
+  "/goals/page": "app/goals/page.js",
+  "/page": "app/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/transactions/page": "app/transactions/page.js"
+}

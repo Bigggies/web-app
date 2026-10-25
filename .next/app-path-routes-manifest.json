@@ -1,0 +1,11 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/health/route": "/api/health",
+  "/api/make-server-36419df2/health/route": "/api/make-server-36419df2/health",
+  "/gcb/page": "/gcb",
+  "/goals/page": "/goals",
+  "/page": "/",
+  "/settings/page": "/settings",
+  "/transactions/page": "/transactions"
+}

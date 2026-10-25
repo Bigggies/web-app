@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@theme {
+  --color-spare-yellow: #F5C000;
+  --color-spare-yellow-light: #FFF3CC;
+  --color-spare-yellow-dark: #C99A00;
+  --color-spare-yellow-dark-surface: #403A20;
+  --color-ash: #6B7280;
+  --color-ash-light: #F3F4F6;
+  --color-ash-dark: #374151;
+  --color-white: #FFFFFF;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  background-color: #F3F4F6;
+  color: #1F2937;
+  margin: 0;
+  padding: 0;
+}
+
+.gcoins-dark [style*='background: rgb(255, 255, 255)'],
+.gcoins-dark [style*='background: #FFFFFF'] {
+  background: #2B2B2B !important;
+}
+
+.gcoins-dark [style*='background: rgb(249, 250, 251)'],
+.gcoins-dark [style*='background: #F9FAFB'],
+.gcoins-dark [style*='background: rgb(243, 244, 246)'],
+.gcoins-dark [style*='background: #F3F4F6'] {
+  background: #1A1A1A !important;
+}
+
+.gcoins-dark [style*='background: rgb(31, 41, 55)'],
+.gcoins-dark [style*='background: #1F2937'] {
+  background: #202020 !important;
+}
+
+.gcoins-dark [style*='background: rgb(55, 65, 81)'],
+.gcoins-dark [style*='background: #374151'] {
+  background: #2B2B2B !important;
+}
+
+.gcoins-light [style*='background: rgb(31, 41, 55)'],
+.gcoins-light [style*='background: #1F2937'] {
+  background: #455563 !important;
+}
+
+.gcoins-dark [style*='color: rgb(31, 41, 55)'],
+.gcoins-dark [style*='color: #1F2937'],
+.gcoins-dark [style*='color: rgb(55, 65, 81)'],
+.gcoins-dark [style*='color: #374151'] {
+  color: #FFFFFF !important;
+}
+
+.gcoins-dark [style*='color: rgb(107, 114, 128)'],
+.gcoins-dark [style*='color: #6B7280'] {
+  color: #D1D5DB !important;
+}
+
+.gcoins-dark [style*='border: 1px solid rgb(229, 231, 235)'],
+.gcoins-dark [style*='border: 1px solid #E5E7EB'] {
+  border-color: #3A3A3A !important;
+}
+
+.gcoins-dark input,
+.gcoins-dark select {
+  color-scheme: dark;
+}
+
+.gcoins-dark option {
+  background: #2B2B2B;
+  color: #FFFFFF;
+}
+
+.gcoins-dark [style*='background: rgb(245, 192, 0)'],
+.gcoins-dark [style*='background: #F5C000'] {
+  color: #1F2937 !important;
+}
+
+.gcoins-dark [style*='background: rgb(255, 243, 204)'],
+.gcoins-dark [style*='background: #FFF3CC'],
+.gcoins-dark [style*='background: rgb(255, 248, 216)'],
+.gcoins-dark [style*='background: #FFF8D8'] {
+  background: var(--color-spare-yellow-dark-surface, #403A20) !important;
+}
+
+.gcoins-dark .gcoins-header {
+  background: #111111 !important;
+}
+
+.gcoins-dark .gcoins-hero {
+  background: linear-gradient(135deg, #202020 0%, #333333 100%) !important;
+}
+
+.gcoins-light .gcoins-header {
+  background: #50616C !important;
+}
+
+.gcoins-light .gcoins-hero {
+  background: linear-gradient(135deg, #50616C 0%, #3F4F59 100%) !important;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes pinShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}

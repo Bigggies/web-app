@@ -1,0 +1,10 @@
+{
+  "description": "Securely store and manage your digital assets with an intuitive interface using white, yellow, and ash colors for a seamless user experience.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
