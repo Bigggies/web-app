@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/anork/Downloads/Telegram%20Desktop/GCoins%202/node_modules/.pnpm/next@16.4.3_@types+node@22._38f51c1ec9c45764fb014710a7c7b5de/node_modules/next/src/client/components/builtin/forbidden.tsx"],"sourcesContent":["import { HTTPAccessErrorFallback } from '../http-access-fallback/error-fallback'\n\nexport default function Forbidden() {\n  return (\n    <HTTPAccessErrorFallback\n      status={403}\n      message=\"This page could not be accessed.\"\n    />\n  )\n}\n"],"names":["Forbidden","HTTPAccessErrorFallback","status","message"],"mappings":";;;+BAEA,WAAA;;;eAAwBA;;;;+BAFgB;AAEzB,SAASA;IACtB,OAAA,WAAA,GACE,CAAA,GAAA,YAAA,GAAA,EAACC,eAAAA,uBAAuB,EAAA;QACtBC,QAAQ;QACRC,SAAQ;;AAGd","ignoreList":[0]}}]
-}

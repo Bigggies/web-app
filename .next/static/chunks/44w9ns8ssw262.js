@@ -1,1 +1,0 @@
-(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,2815,t=>{"use strict";var i=t.i(74621),s=t.i(92877),e=t.i(72769),o=t.i(47638);t.s(["default",0,function(){let{setScreen:t,setAppMode:c}=(0,e.useGCoins)();return(0,s.useEffect)(()=>{c("gcoins"),t("transactions")},[c,t]),(0,i.jsx)(o.f,{})}])}]);
