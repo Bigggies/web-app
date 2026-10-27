@@ -15,7 +15,7 @@ export function AuthModal({
   const [agreed, setAgreed] = useState(false)
   if (!open) return null
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-50 px-5" style={{ background: 'rgba(0,0,0,0.55)' }}>
+    <div className="fixed inset-0 flex items-center justify-center z-50 px-5" style={{ background: 'rgba(0,0,0,0.55)' }}>
       <div className="rounded-2xl p-5 flex flex-col gap-4 w-full" style={{ background: '#FFFFFF', maxWidth: 340 }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: '#FFF3CC' }}>

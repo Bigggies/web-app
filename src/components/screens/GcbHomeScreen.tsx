@@ -13,7 +13,6 @@ import {
   IconActivity,
   IconArrowDown,
   IconBanknote,
-  IconBattery,
   IconBell,
   IconBriefcase,
   IconCheck,
@@ -28,17 +27,15 @@ import {
   IconPower,
   IconSettings,
   IconShield,
-  IconSignal,
   IconSmartphone,
   IconTag,
   IconTarget,
   IconUser,
-  IconWifi,
   IconZap,
 } from '@/components/icons'
 import { TransactionHistoryList } from '@/components/screens/TransactionHistoryList'
 
-export function GcbApp({
+export function GcbHomeScreen({
   mode,
   pinCode,
   theme,
@@ -186,32 +183,20 @@ export function GcbApp({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-2 sm:p-4" style={{ background: dark ? '#111111' : '#D7DADD' }}>
+    <div className="web-app min-h-screen w-full" style={{ background: dark ? '#111111' : '#D7DADD' }}>
       <div
-        className={`relative flex flex-col w-full max-w-sm overflow-hidden ${
+        className={`app-shell relative flex flex-col w-full min-h-dvh ${
           mode === 'gcoins' ? (dark ? 'gcoins-dark' : 'gcoins-light') : ''
         }`}
         style={{
-          height: '844px',
           background: pageBg,
           color: text,
-          borderRadius: '44px',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.35), 0 0 0 12px #242424',
         }}
       >
         {mode === 'gcoins' ? (
           gcoinsModule
         ) : (
           <>
-            <div className="flex items-center justify-between px-6 pt-4 pb-3 text-xs font-semibold">
-              <span>3:23</span>
-              <div className="flex items-center gap-2">
-                <IconSignal size={13} color={text} />
-                <IconWifi size={13} color={text} />
-                <IconBattery size={16} color={text} />
-              </div>
-            </div>
-
             {mode === 'gcoinsLogin' ? (
               <div className="flex-1 flex flex-col">
                 <div className="flex items-center gap-4 px-5 py-4" style={{ background: headerBg, color: '#FFFFFF' }}>
@@ -224,7 +209,7 @@ export function GcbApp({
                   </button>
                   <p className="text-lg font-semibold">Open GCoins</p>
                 </div>
-                <div className="flex-1 flex flex-col justify-center px-6 pb-16">
+                <div className="w-full max-w-lg mx-auto flex-1 flex flex-col justify-center px-6 py-12">
                   <div className="flex flex-col items-center gap-3 mb-8">
                     <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: '#F5C000' }}>
                       <IconCoin size={31} color="#1F2937" />
@@ -750,7 +735,7 @@ export function GcbApp({
             ) : (
               <div className="flex-1 overflow-y-auto pb-8 relative" style={{ background: pageBg }}>
                 <div className="absolute inset-x-0 top-0 h-56" style={{ background: headerBg }} />
-                <div className="px-5 pt-5 relative">
+                <div className="gcb-home-content px-5 pt-5 relative">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <button
@@ -853,7 +838,7 @@ export function GcbApp({
             )}
 
             {mode === 'gcbHome' && (
-              <div className="grid grid-cols-5 px-4 py-3" style={{ background: surface, borderTop: `1px solid ${dark ? '#333333' : '#E5E7EB'}` }}>
+              <div className="app-nav grid grid-cols-5 px-4 py-3" style={{ background: surface, borderTop: `1px solid ${dark ? '#333333' : '#E5E7EB'}` }}>
                 {['Home', 'Payments', 'Cards', 'Help', 'More'].map((item, i) => (
                   <div key={item} className="flex flex-col items-center gap-1">
                     <IconHome size={18} color={i === 0 ? text : muted} />

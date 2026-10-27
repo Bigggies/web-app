@@ -39,8 +39,8 @@ export function RoundUpSetupSheet({
   if (!open) return null
 
   return (
-    <div className="absolute inset-0 flex flex-col justify-end z-50 overflow-hidden" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={handleCancel}>
-      <div className="w-full rounded-t-3xl p-5 flex flex-col gap-4 overflow-y-auto" style={{ background: '#FFFFFF', maxHeight: '92%', overscrollBehavior: 'contain' }} onClick={e => e.stopPropagation()}>
+    <div className="sheet-backdrop fixed inset-0 flex flex-col justify-end z-50 overflow-hidden" style={{ background: 'rgba(0,0,0,0.45)' }} onClick={handleCancel}>
+      <div className="sheet-panel w-full rounded-t-3xl p-5 flex flex-col gap-4 overflow-y-auto" style={{ background: '#FFFFFF', maxHeight: '92%', overscrollBehavior: 'contain' }} onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 rounded-full mx-auto flex-shrink-0" style={{ background: '#E5E7EB' }} />
         <div className="flex items-center justify-between flex-shrink-0">
           <h2 className="text-base font-bold" style={{ color: '#1F2937', fontFamily: 'var(--font-display, "DM Serif Display", serif)' }}>Set your round-up</h2>

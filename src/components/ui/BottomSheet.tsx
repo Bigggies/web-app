@@ -21,12 +21,12 @@ export function BottomSheet({
   if (!open) return null
   return (
     <div
-      className="absolute inset-0 flex flex-col justify-end z-50 overflow-hidden"
+      className="sheet-backdrop fixed inset-0 flex flex-col justify-end z-50 overflow-hidden"
       style={{ background: opaqueBackdrop ? '#F3F4F6' : 'rgba(0,0,0,0.45)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-full min-w-0 rounded-t-3xl p-5 flex flex-col gap-4 overflow-y-auto overflow-x-hidden"
+        className="sheet-panel w-full max-w-full min-w-0 rounded-t-3xl p-5 flex flex-col gap-4 overflow-y-auto overflow-x-hidden"
         style={{
           background: '#FFFFFF',
           maxHeight: fullHeight ? '100%' : '88%',

@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type {
   AdvancePaymentMode,
   AdvanceRepaymentPlan,
@@ -34,7 +36,7 @@ import {
   IconTarget,
 } from '@/components/icons'
 
-export function HomeScreen({
+export function GCoinsHomeScreen({
   roundUpOn,
   roundUpPaused,
   vaultBalance,
@@ -72,7 +74,6 @@ export function HomeScreen({
   onRedeemPoints,
   onRedeemReward,
   onMarkVoucherUsed,
-  onGoToGoals,
 }: {
   roundUpOn: boolean
   roundUpPaused: boolean
@@ -112,8 +113,8 @@ export function HomeScreen({
   onRedeemPoints: () => void
   onRedeemReward: (category: RedemptionCategory, points: number, reward: string) => boolean
   onMarkVoucherUsed: (id: string) => void
-  onGoToGoals: () => void
 }) {
+  const router = useRouter()
   const [sheet, setSheet] = useState<'addMoney' | 'withdraw' | 'borrow' | null>(null)
   const [showReminder, setShowReminder] = useState(false)
   const [showRewards, setShowRewards] = useState(false)
@@ -139,7 +140,7 @@ export function HomeScreen({
       : { background: 'rgba(16,185,129,0.16)', color: '#6EE7B7' }
 
   return (
-    <div className="flex flex-col gap-4 pb-6 relative">
+    <div className="home-layout flex flex-col gap-4 pb-6 relative">
       <AddMoneySheet open={sheet === 'addMoney'} onClose={() => setSheet(null)} onAdd={onAdd} pinCode={pinCode} />
       <WithdrawSheet
         open={sheet === 'withdraw'}
@@ -312,7 +313,7 @@ export function HomeScreen({
         {[
           { label: 'Add Money', Icon: IconPlus, action: 'addMoney' as const },
           { label: 'Withdraw', Icon: IconArrowDown, action: 'withdraw' as const },
-          { label: 'Set Goal', Icon: IconTarget, action: null, onTap: onGoToGoals },
+          { label: 'Set Goal', Icon: IconTarget, action: null, onTap: () => router.push('/gcoins/goals') },
           { label: 'Borrow', Icon: IconBanknote, action: 'borrow' as const, highlight: true },
         ].map(({ label, Icon, action, highlight, onTap }) => (
           <button
@@ -453,7 +454,10 @@ export function HomeScreen({
 
       {/* Recent transactions */}
       <div className="mx-4">
-        <h3 className="font-semibold text-sm mb-3" style={{ color: '#374151' }}>Recent Transactions</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-sm" style={{ color: '#374151' }}>Recent Transactions</h3>
+          <Link href="/gcoins/activity" className="text-xs font-semibold" style={{ color: '#F5C000' }}>View all</Link>
+        </div>
         <TransactionHistoryList transactions={transactions} limit={4} />
       </div>
     </div>

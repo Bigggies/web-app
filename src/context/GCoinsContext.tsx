@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import type {
   AdvancePaymentMode,
   AdvanceRepaymentPlan,
@@ -89,6 +89,7 @@ interface GCoinsContextType {
   setMainAccountBalance: React.Dispatch<React.SetStateAction<number>>
   reminderFrequency: ReminderFrequency
   setReminderFrequency: (freq: ReminderFrequency) => void
+  goalHistory: { date: string; amount: number }[]
   goals: Goal[]
   setGoals: React.Dispatch<React.SetStateAction<Goal[]>>
   transactions: LedgerTransaction[]
@@ -159,6 +160,46 @@ export function GCoinsProvider({ children }: { children: React.ReactNode }) {
   const [processedTransactionIds, setProcessedTransactionIds] = useState<Set<string>>(() => new Set())
   const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('Daily')
   const [goals, setGoals] = useState<Goal[]>(baseGoals)
+  // DEMO: six monthly seed contributions, totaling the existing sample goals.
+  const [goalHistory, setGoalHistory] = useState(() => [500, 750, 900, 1100, 1200, 1165].map((amount, index) => {
+    const date = new Date(); date.setMonth(date.getMonth() - 5 + index, 1)
+    return { date: date.toISOString(), amount }
+  }))
+  useEffect(() => {
+    const timer = setInterval(() => {
+      let main = mainAccountBalance, vault = vaultBalance
+      const entries: { date: string; amount: number }[] = []
+      let changed = false
+      const updated = goals.map(goal => {
+        const rule = goal.automation
+        if (!rule || rule.paused || goal.archived) return goal
+        if (goal.saved >= goal.target) { changed = true; return { ...goal, automation: { ...rule, paused: true } } }
+        if (new Date(rule.nextDate + 'T00:00:00').getTime() > Date.now()) return goal
+        changed = true
+        const amount = Math.min(rule.amount, +(goal.target - goal.saved).toFixed(2))
+        const available = rule.source === 'GCB Main Account' ? main : vault
+        const next = new Date(rule.nextDate + 'T12:00:00')
+        do {
+          if (rule.frequency === 'Monthly') {
+            next.setDate(1); next.setMonth(next.getMonth() + 1)
+            next.setDate(Math.min(rule.day, new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate()))
+          } else next.setDate(next.getDate() + (rule.frequency === 'Weekly' ? 7 : 1))
+        } while (next.getTime() <= Date.now())
+        const nextDate = calendarDateKey(next)
+        if (available < amount) return { ...goal, automation: { ...rule, nextDate, warning: true } }
+        if (rule.source === 'GCB Main Account') main = +(main - amount).toFixed(2)
+        else vault = +(vault - amount).toFixed(2)
+        entries.push({ date: new Date().toISOString(), amount })
+        const saved = +(goal.saved + amount).toFixed(2)
+        return { ...goal, saved, automation: { ...rule, nextDate, warning: false, paused: saved >= goal.target } }
+      })
+      if (changed) {
+        setGoals(updated); setMainAccountBalance(main); setVaultBalance(vault)
+        if (entries.length) setGoalHistory(history => [...history, ...entries])
+      }
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [goals, mainAccountBalance, vaultBalance])
   const [transactions, setTransactions] = useState<LedgerTransaction[]>(initialTransactions)
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications)
 
@@ -577,7 +618,9 @@ export function GCoinsProvider({ children }: { children: React.ReactNode }) {
 
   function handleGoalAllocation(goalId: number, amount: number) {
     const goal = goals.find(item => item.id === goalId)
-    setGoals(current => current.map(item => (item.id === goalId ? { ...item, saved: +(item.saved + amount).toFixed(2) } : item)))
+    if (!goal || !Number.isFinite(amount) || amount <= 0 || amount > vaultBalance || amount > goal.target - goal.saved) return
+    setGoalHistory(history => [...history, { date: new Date().toISOString(), amount }])
+    setGoals(current => current.map(item => (item.id === goalId ? { ...item, saved: +(item.saved + amount).toFixed(2), automation: item.automation ? { ...item.automation, paused: item.saved + amount >= item.target || item.automation.paused } : undefined } : item)))
     setVaultBalance(balance => +(balance - amount).toFixed(2))
     setTransactions(items => [
       {
@@ -615,7 +658,7 @@ export function GCoinsProvider({ children }: { children: React.ReactNode }) {
   }
 
   function handleClearCompletedGoals() {
-    setGoals(current => current.filter(goal => goal.saved < goal.target))
+    setGoals(current => current.map(goal => goal.saved >= goal.target ? { ...goal, archived: true } : goal))
   }
 
   return (
@@ -676,6 +719,7 @@ export function GCoinsProvider({ children }: { children: React.ReactNode }) {
         setMainAccountBalance,
         reminderFrequency,
         setReminderFrequency,
+        goalHistory,
         goals,
         setGoals,
         transactions,

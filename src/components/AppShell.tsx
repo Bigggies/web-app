@@ -1,28 +1,35 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { useGCoins } from '@/context/GCoinsContext'
-import { GCoinsLogo, IconBattery, IconBell, IconSignal, IconWifi } from '@/components/icons'
-import { RoundUpSetupSheet } from '@/components/sheets/RoundUpSetupSheet'
-import { NotificationsSheet } from '@/components/sheets/NotificationsSheet'
-import { ProfileSheet } from '@/components/sheets/ProfileSheet'
-import { RepayAdvanceSheet } from '@/components/sheets/RepayAdvanceSheet'
-import { BottomSheet } from '@/components/ui/BottomSheet'
-import { BottomNav } from '@/components/navigation/BottomNav'
-import { HomeScreen } from '@/components/screens/HomeScreen'
-import { TransactionsScreen } from '@/components/screens/TransactionsScreen'
-import { GoalsScreen } from '@/components/screens/GoalsScreen'
-import { SettingsScreen } from '@/components/screens/SettingsScreen'
-import { GcbApp } from '@/components/screens/GcbApp'
+import React from "react";
+import { useRouter } from "next/navigation";
+import type { AppMode, Screen } from "@/types";
+import { useGCoins } from "@/context/GCoinsContext";
+import { GCoinsLogo, IconBell } from "@/components/icons";
+import { RoundUpSetupSheet } from "@/components/sheets/RoundUpSetupSheet";
+import { NotificationsSheet } from "@/components/sheets/NotificationsSheet";
+import { ProfileSheet } from "@/components/sheets/ProfileSheet";
+import { RepayAdvanceSheet } from "@/components/sheets/RepayAdvanceSheet";
+import { BottomSheet } from "@/components/ui/BottomSheet";
+import { BottomNav } from "@/components/navigation/BottomNav";
+import { GCoinsHomeScreen } from "@/components/screens/GCoinsHomeScreen";
+import { TransactionsScreen } from "@/components/screens/TransactionsScreen";
+import { GoalsScreen } from "@/components/screens/GoalsScreen";
+import { SettingsScreen } from "@/components/screens/SettingsScreen";
+import { GcbHomeScreen } from "@/components/screens/GcbHomeScreen";
 
-export function GCoinsShell() {
+export function AppShell({
+  routeScreen,
+  login = false,
+}: {
+  routeScreen?: Screen;
+  login?: boolean;
+}) {
+  const router = useRouter();
   const {
-    appMode,
-    setAppMode,
+    appMode: storedAppMode,
+    setAppMode: storeAppMode,
     gcbTheme,
     setGcbTheme,
-    screen,
-    setScreen,
     roundUpOn,
     setRoundUpPaused,
     roundUpPaused,
@@ -85,53 +92,85 @@ export function GCoinsShell() {
     handleGoalAllocation,
     handleGoalWithdrawal,
     handleClearCompletedGoals,
-  } = useGCoins()
+  } = useGCoins();
+
+  const screen = routeScreen ?? "home";
+  const appMode: AppMode = login
+    ? "gcoinsLogin"
+    : routeScreen
+      ? "gcoins"
+      : storedAppMode === "gcoins" || storedAppMode === "gcoinsLogin"
+        ? "gcbHome"
+        : storedAppMode;
+
+  function setScreen(next: Screen) {
+    const routes: Record<Screen, string> = {
+      home: "/gcoins/home",
+      transactions: "/gcoins/activity",
+      goals: "/gcoins/goals",
+      settings: "/gcoins/profile",
+    };
+    router.push(routes[next]);
+  }
+
+  function setAppMode(next: AppMode) {
+    storeAppMode(next);
+    if (next === "gcoins") router.push("/gcoins/home");
+    else if (next === "gcoinsLogin") router.push("/gcoins/login");
+    else if (routeScreen || login) router.push("/");
+  }
 
   const gcoinsModule = (
     <>
       {/* Setup sheet */}
-      <RoundUpSetupSheet open={showSetup} onSave={handleSetupSave} onCancel={() => setShowSetup(false)} />
-
-      {/* Status bar */}
-      <div className="gcoins-header flex items-center justify-between px-6 pt-4 pb-2 flex-shrink-0" style={{ background: '#1F2937' }}>
-        <span className="text-xs font-semibold text-white">9:41</span>
-        <div className="w-24 h-6 rounded-full" style={{ background: '#1F2937', border: '2px solid #374151' }} />
-        <div className="flex gap-2 items-center">
-          <IconSignal size={13} color="white" />
-          <IconWifi size={13} color="white" />
-          <IconBattery size={16} color="white" />
-        </div>
-      </div>
+      <RoundUpSetupSheet
+        open={showSetup}
+        onSave={handleSetupSave}
+        onCancel={() => setShowSetup(false)}
+      />
 
       {/* Header */}
-      <div className="gcoins-header flex items-center justify-between px-5 py-3 flex-shrink-0" style={{ background: '#1F2937' }}>
+      <div
+        className="gcoins-header flex items-center justify-between px-5 py-3 flex-shrink-0"
+        style={{ background: "#1F2937" }}
+      >
         <div>
-          <p className="text-xs font-medium" style={{ color: '#9CA3AF' }}>Good morning,</p>
+          <p className="text-xs font-medium" style={{ color: "#9CA3AF" }}>
+            Good morning,
+          </p>
           <GCoinsLogo size={22} />
         </div>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => {
-              setShowProfile(false)
-              setShowNotifs(true)
+              setShowProfile(false);
+              setShowNotifs(true);
             }}
             className="relative w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ background: '#374151', border: 'none', cursor: 'pointer' }}
+            style={{ background: "#374151", border: "none", cursor: "pointer" }}
           >
             <IconBell size={15} color="white" />
-            {notifications.some(notification => !notification.read) && (
-              <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style={{ background: '#F5C000' }} />
+            {notifications.some((notification) => !notification.read) && (
+              <span
+                className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full"
+                style={{ background: "#F5C000" }}
+              />
             )}
           </button>
           <button
             type="button"
             onClick={() => {
-              setShowNotifs(false)
-              setShowProfile(true)
+              setShowNotifs(false);
+              setShowProfile(true);
             }}
             className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-            style={{ background: '#F5C000', color: '#1F2937', border: 'none', cursor: 'pointer' }}
+            style={{
+              background: "#F5C000",
+              color: "#1F2937",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
             KA
           </button>
@@ -139,11 +178,16 @@ export function GCoinsShell() {
       </div>
 
       {/* Global sheets */}
-      <NotificationsSheet open={showNotifs} onClose={() => setShowNotifs(false)} notifications={notifications} onChange={setNotifications} />
+      <NotificationsSheet
+        open={showNotifs}
+        onClose={() => setShowNotifs(false)}
+        notifications={notifications}
+        onChange={setNotifications}
+      />
       <ProfileSheet
         open={showProfile}
         onClose={() => setShowProfile(false)}
-        onNavigateSettings={() => setScreen('settings')}
+        onNavigateSettings={() => setScreen("settings")}
         pinCode={transactionPin}
         onPinChange={setTransactionPin}
         onLogout={() => setShowLogout(true)}
@@ -154,12 +198,12 @@ export function GCoinsShell() {
         mode={advancePaymentMode}
         onClose={() => setShowRepayAdvance(false)}
         onReturnHome={() => {
-          setShowRepayAdvance(false)
-          setScreen('home')
+          setShowRepayAdvance(false);
+          setScreen("home");
         }}
         onAddMoney={() => {
-          setShowRepayAdvance(false)
-          setAppMode('gcbHome')
+          setShowRepayAdvance(false);
+          setAppMode("gcbHome");
         }}
         outstanding={advanceOutstanding}
         mainBalance={mainAccountBalance}
@@ -168,8 +212,12 @@ export function GCoinsShell() {
         pinCode={transactionPin}
         onRepay={handleRepayAdvance}
       />
-      <BottomSheet open={showLogout} onClose={() => setShowLogout(false)} title="Log Out">
-        <p className="text-sm" style={{ color: '#374151' }}>
+      <BottomSheet
+        open={showLogout}
+        onClose={() => setShowLogout(false)}
+        title="Log Out"
+      >
+        <p className="text-sm" style={{ color: "#374151" }}>
           Are you sure you want to log out of GCoins and return to the GCB app?
         </p>
         <div className="flex gap-2">
@@ -177,21 +225,20 @@ export function GCoinsShell() {
             type="button"
             onClick={() => setShowLogout(false)}
             className="flex-1 py-3 rounded-xl text-sm font-semibold"
-            style={{ background: '#F3F4F6', color: '#6B7280' }}
+            style={{ background: "#F3F4F6", color: "#6B7280" }}
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={() => {
-              setShowProfile(false)
-              setShowNotifs(false)
-              setShowLogout(false)
-              setScreen('home')
-              setAppMode('gcbHome')
+              setShowProfile(false);
+              setShowNotifs(false);
+              setShowLogout(false);
+              setAppMode("gcbHome");
             }}
             className="flex-1 py-3 rounded-xl text-sm font-semibold"
-            style={{ background: '#EF4444', color: '#FFFFFF' }}
+            style={{ background: "#EF4444", color: "#FFFFFF" }}
           >
             Log Out
           </button>
@@ -199,9 +246,12 @@ export function GCoinsShell() {
       </BottomSheet>
 
       {/* Screen content */}
-      <div className="flex-1 overflow-y-auto relative" style={{ visibility: showProfile ? 'hidden' : 'visible' }}>
-        {screen === 'home' && (
-          <HomeScreen
+      <div
+        className="gcoins-content flex-1 min-w-0 relative"
+        style={{ visibility: showProfile ? "hidden" : "visible" }}
+      >
+        {screen === "home" && (
+          <GCoinsHomeScreen
             roundUpOn={roundUpOn}
             roundUpPaused={roundUpPaused}
             vaultBalance={vaultBalance}
@@ -234,33 +284,45 @@ export function GCoinsShell() {
             onAdd={handleVaultAddition}
             onWithdraw={handleVaultWithdrawal}
             onBorrow={handleBorrow}
-            onOpenRepay={mode => {
-              setAdvancePaymentMode(mode)
-              setShowRepayAdvance(true)
+            onOpenRepay={(mode) => {
+              setAdvancePaymentMode(mode);
+              setShowRepayAdvance(true);
             }}
             onReminderChange={setReminderFrequency}
-            onToggleFreeze={() => !freezeUsed && setFreezeEnabled(enabled => !enabled)}
+            onToggleFreeze={() =>
+              !freezeUsed && setFreezeEnabled((enabled) => !enabled)
+            }
             onRedeemPoints={handleRedeemPointsForAdvance}
             onRedeemReward={handleRewardRedemption}
             onMarkVoucherUsed={handleMarkVoucherUsed}
-            onGoToGoals={() => setScreen('goals')}
           />
         )}
-        {screen === 'transactions' && <TransactionsScreen records={monthlyRecords} transactions={transactions} />}
-        {screen === 'goals' && (
+        {screen === "transactions" && (
+          <TransactionsScreen
+            records={monthlyRecords}
+            transactions={transactions}
+          />
+        )}
+        {screen === "goals" && (
           <GoalsScreen
             goals={goals}
             vaultBalance={vaultBalance}
             pinCode={transactionPin}
-            onCreateGoal={goal => setGoals(current => [goal, ...current])}
-            onUpdateGoal={updated => setGoals(current => current.map(goal => (goal.id === updated.id ? updated : goal)))}
+            onCreateGoal={(goal) => setGoals((current) => [goal, ...current])}
+            onUpdateGoal={(updated) =>
+              setGoals((current) =>
+                current.map((goal) =>
+                  goal.id === updated.id ? updated : goal,
+                ),
+              )
+            }
             onDeleteGoal={handleDeleteGoal}
             onAllocate={handleGoalAllocation}
             onWithdrawGoal={handleGoalWithdrawal}
             onClearCompleted={handleClearCompletedGoals}
           />
         )}
-        {screen === 'settings' && (
+        {screen === "settings" && (
           <SettingsScreen
             roundUpOn={roundUpOn}
             threshold={balanceSafeguard}
@@ -281,18 +343,18 @@ export function GCoinsShell() {
       {/* Bottom navigation */}
       <BottomNav
         activeScreen={screen}
-        onSelectScreen={id => {
-          setShowNotifs(false)
-          setShowProfile(false)
-          setScreen(id)
+        onSelectScreen={(id) => {
+          setShowNotifs(false);
+          setShowProfile(false);
+          setScreen(id);
         }}
         theme={gcbTheme}
       />
     </>
-  )
+  );
 
   return (
-    <GcbApp
+    <GcbHomeScreen
       mode={appMode}
       pinCode={transactionPin}
       theme={gcbTheme}
@@ -302,8 +364,7 @@ export function GCoinsShell() {
       onThemeChange={setGcbTheme}
       onModeChange={setAppMode}
       onEnterGCoins={() => {
-        setAppMode('gcoins')
-        setScreen('home')
+        setAppMode("gcoins");
       }}
       onCompleteTransaction={handleCompletedTransaction}
       roundUpOn={roundUpOn}
@@ -312,5 +373,5 @@ export function GCoinsShell() {
       advanceActive={advanceActive}
       advanceTopUp={advanceTopUp}
     />
-  )
+  );
 }

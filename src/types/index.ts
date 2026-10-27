@@ -25,6 +25,8 @@ export type Goal = {
   saved: number
   deadline: string
   color: string
+  archived?: boolean
+  automation?: { amount: number; frequency: 'Daily' | 'Weekly' | 'Monthly'; source: 'GCB Main Account' | 'Round-Up Savings'; nextDate: string; day: number; paused: boolean; warning?: boolean }
   withdrawn?: boolean
 }
 

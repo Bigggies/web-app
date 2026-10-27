@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useGCoins } from '@/context/GCoinsContext'
+import { GoalOverview, AutoSaveSheet } from '@/components/screens/GoalSavings'
 import type { Goal } from '@/types'
 import { MONTHS, YEARS } from '@/constants'
 import { BottomSheet } from '@/components/ui/BottomSheet'
@@ -28,6 +30,9 @@ export function GoalsScreen({
   onWithdrawGoal: (goalId: number) => void
   onClearCompleted: () => void
 }) {
+  const [tab, setTab] = useState<'all' | 'overview'>('all')
+  const [autoGoal, setAutoGoal] = useState<number | null>(null)
+  const { goalHistory } = useGCoins()
   const [showNew, setShowNew] = useState(false)
   const [goalName, setGoalName] = useState('')
   const [goalTarget, setGoalTarget] = useState('')
@@ -42,11 +47,11 @@ export function GoalsScreen({
   const [editTarget, setEditTarget] = useState('')
   const [editDeadline, setEditDeadline] = useState('')
   const selectedGoal = goals.find(goal => goal.id === selectedGoalId)
-  const hasCompleted = goals.some(goal => goal.saved >= goal.target)
+  const hasCompleted = goals.some(goal => !goal.archived && goal.saved >= goal.target)
 
   function createGoal() {
     const target = Number(goalTarget)
-    if (!goalName.trim() || target <= 0) return
+    if (!goalName.trim() || !Number.isFinite(target) || target <= 0) return
     onCreateGoal({
       id: Date.now(),
       name: goalName.trim(),
@@ -66,7 +71,7 @@ export function GoalsScreen({
     if (!selectedGoal) return
     const remaining = selectedGoal.target - selectedGoal.saved
     const amount = Math.min(Number(allocation), vaultBalance, remaining)
-    if (amount <= 0) return
+    if (!Number.isFinite(amount) || amount <= 0) return
     onAllocate(selectedGoal.id, amount)
     setAllocation('')
   }
@@ -109,7 +114,8 @@ export function GoalsScreen({
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-6 pt-4">
+    <div className="goals-layout flex flex-col gap-4 pb-6 pt-4">
+      <AutoSaveSheet goal={goals.find(goal => goal.id === autoGoal)} onClose={() => setAutoGoal(null)} onSave={onUpdateGoal} />
       <BottomSheet
         open={Boolean(selectedGoal)}
         onClose={closeGoalDetails}
@@ -332,7 +338,11 @@ export function GoalsScreen({
         </div>
       </div>
 
-      {showNew && (
+      <div className="mx-4 flex rounded-full p-1" style={{ background: '#F3F4F6' }} role="tablist" aria-label="Goal views">
+        {(['all', 'overview'] as const).map(value => <button key={value} role="tab" aria-selected={tab === value} onClick={() => setTab(value)} className="flex-1 rounded-full py-2 text-xs font-semibold" style={{ background: tab === value ? '#F5C000' : 'transparent', color: tab === value ? '#1F2937' : '#6B7280' }}>{value === 'all' ? 'All Goals' : 'Overview'}</button>)}
+      </div>
+      {tab === 'overview' && <GoalOverview goals={goals} history={goalHistory} />}
+      {tab === 'all' && showNew && (
         <div className="mx-4 rounded-2xl p-4" style={{ background: '#FFFFFF', border: '2px solid #F5C000' }}>
           <p className="text-sm font-semibold mb-3" style={{ color: '#1F2937' }}>Create New Goal</p>
           <div className="flex flex-col gap-2 mb-3">
@@ -392,14 +402,16 @@ export function GoalsScreen({
         </div>
       )}
 
-      {goals.map(goal => {
+      {tab === 'all' && goals.filter(goal => !goal.archived).map(goal => {
         const pct = Math.min((goal.saved / goal.target) * 100, 100)
         const done = pct >= 100
         return (
-          <button
+          <div
             key={goal.id}
+            role="button" tabIndex={0}
+            onKeyDown={event => { if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); setSelectedGoalId(goal.id) } }}
             onClick={() => setSelectedGoalId(goal.id)}
-            className="mx-4 rounded-2xl p-4 text-left"
+            className="goal-card mx-4 rounded-2xl p-4 text-left"
             style={{ background: '#FFFFFF', border: 'none' }}
           >
             <div className="flex items-center gap-3 mb-3">
@@ -423,15 +435,19 @@ export function GoalsScreen({
               <span className="font-semibold" style={{ color: '#1F2937' }}>GH₵ {goal.target.toLocaleString()}</span>
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F3F4F6' }}>
-              <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: done ? '#10B981' : goal.color }} />
+              <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: done ? '#10B981' : '#F5C000' }} />
             </div>
             <p className="text-xs mt-1.5 text-right font-medium" style={{ color: done ? '#059669' : '#6B7280' }}>
               {pct.toFixed(0)}% reached
             </p>
-          </button>
+            <div className="mt-2 flex items-center justify-between gap-2">
+              {goal.automation && <button onClick={event => { event.stopPropagation(); setAutoGoal(goal.id) }} className="text-xs rounded-full px-2.5 py-1" style={{ background: '#F3F4F6', color: goal.automation.warning ? '#F5C000' : '#6B7280' }}>{goal.automation.warning ? '? Transfer skipped ? retry scheduled' : done ? 'Auto-save paused ? goal complete' : `GH?${goal.automation.amount}/${goal.automation.frequency === 'Daily' ? 'day' : goal.automation.frequency === 'Weekly' ? 'week' : 'month'}${goal.automation.paused ? ' ? Paused' : ''}`}</button>}
+              {!done && <button aria-label={`Set up auto-save to ${goal.name}`} onClick={event => { event.stopPropagation(); setAutoGoal(goal.id) }} className="text-xs rounded-full px-3 py-1 ml-auto" style={{ background: '#F3F4F6', color: '#6B7280' }}>? Auto-save</button>}
+            </div>
+          </div>
         )
       })}
-      {goals.length === 0 && (
+      {tab === 'all' && goals.filter(goal => !goal.archived).length === 0 && (
         <div className="mx-4 rounded-2xl p-8 text-center" style={{ background: '#FFFFFF' }}>
           <p className="text-sm font-semibold" style={{ color: '#374151' }}>No active goals</p>
           <p className="text-xs mt-1" style={{ color: '#9CA3AF' }}>Create a goal and allocate funds from your Vault.</p>

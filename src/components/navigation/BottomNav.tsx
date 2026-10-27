@@ -22,11 +22,11 @@ export function BottomNav({
 
   return (
     <div
-      className="flex-shrink-0 grid grid-cols-4"
+      className="app-nav flex-shrink-0 grid grid-cols-4"
       style={{
         background: theme === 'dark' ? '#2B2B2B' : '#FFFFFF',
         borderTop: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E5E7EB'}`,
-        paddingBottom: '20px',
+        paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
       }}
     >
       {navItems.map(({ id, label, Icon }) => {

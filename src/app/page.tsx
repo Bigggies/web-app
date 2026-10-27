@@ -1,7 +1,5 @@
-'use client'
-
-import { GCoinsShell } from '@/components/GCoinsShell'
+import { AppShell } from '@/components/AppShell'
 
 export default function HomePage() {
-  return <GCoinsShell />
+  return <AppShell />
 }
